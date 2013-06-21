@@ -1,7 +1,7 @@
 package com.ameron32.importtestandroid;
 
-import com.ameron32.testing.ImportTesting;
 import com.ameron32.importtestandroid.Downloader;
+import com.ameron32.testing.ImportTesting;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -9,12 +9,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.Menu;
 import android.view.View;
-//import android.view.View;
 
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.widget.Button;
-//import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
 public class MainActivity extends Activity implements OnClickListener {
@@ -31,23 +29,17 @@ public class MainActivity extends Activity implements OnClickListener {
         setContentView(R.layout.activity_main);
         tvMain = (TextView) findViewById(R.id.tvMain);
         tvMain.setOnClickListener(ocl);
-        it = new ImportTesting(
-                new String[] {
-                    sdDir
-                }
-                );
-        downloadAssets(null, 
-                new String[] { 
-                "item155-armor.csv",
-                "item155-meleeweapons.csv",
-                "item155-meleeattackoptions.csv",
-                "item155-shield.csv" }, 
-                true, 
-                new String[] { 
-                downloadDir + "item155-armor.csv",
-                downloadDir + "item155-meleeweapons.csv",
-                downloadDir + "item155-meleeattackoptions.csv",
-                downloadDir + "item155-shield.csv"});
+        start();
+    }
+    
+    private void start() {
+        it = new ImportTesting(new String[] { sdDir });
+        String[] fileNames = ImportTesting.getAllFiles();
+        String[] downloadLocations = fileNames.clone();
+        for (int i = 0; i < downloadLocations.length; i++) {
+            downloadLocations[i] = downloadDir + downloadLocations[i];
+        }
+        downloadAssets(null, fileNames, true, downloadLocations);
     }
 
     @Override
