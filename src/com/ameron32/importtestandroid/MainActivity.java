@@ -34,7 +34,7 @@ public class MainActivity extends Activity implements OnClickListener {
     
     private void start() {
         it = new ImportTesting(new String[] { sdDir });
-        String[] fileNames = ImportTesting.getAllFiles();
+        String[] fileNames = ImportTesting.getAllFilenames();
         String[] downloadLocations = fileNames.clone();
         for (int i = 0; i < downloadLocations.length; i++) {
             downloadLocations[i] = downloadDir + downloadLocations[i];
@@ -49,25 +49,10 @@ public class MainActivity extends Activity implements OnClickListener {
         return true;
     }
 
-    ProgressDialog mDownloadDialog;
     private void downloadAssets(String dlDir, String[] fileNames,
             boolean update, String[] sUrl) {
-        b = new Button(this);
- //       b.setOnClickListener(this);
-//        b.setText("Close");
-    
-        final ProgressDialog mDownloadDialog = new ProgressDialog(MainActivity.this);
-        this.mDownloadDialog = mDownloadDialog;
-        mDownloadDialog.setTitle("Downloading from Dropbox...");
-        mDownloadDialog.setMessage("");
-        mDownloadDialog.setIndeterminate(false);
-        mDownloadDialog.setMax(100);
-        mDownloadDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        mDownloadDialog.setCancelable(false);
-        mDownloadDialog.setButton(ProgressDialog.BUTTON_POSITIVE, "Close", (android.content.DialogInterface.OnClickListener) this);
-
         // execute this when the downloader must be fired
-        final Downloader d = new Downloader(MainActivity.this, mDownloadDialog, b);
+        final Downloader d = new Downloader(MainActivity.this, importAndLoad);
         if (dlDir != null)
             d.setDlDir(dlDir);
         d.setDlFiles(fileNames);
@@ -75,8 +60,6 @@ public class MainActivity extends Activity implements OnClickListener {
             d.setUpdate(update);
         d.execute(sUrl);
     }
-
-    Button b;
 
     @Override
     public void onClick(DialogInterface dialog, int which) {
@@ -86,9 +69,21 @@ public class MainActivity extends Activity implements OnClickListener {
     android.view.View.OnClickListener ocl = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            it.main();
-            tvMain.setText(ImportTesting.getSB());
+
         }
     };
+    
+    Runnable updateText = new Runnable() {
+		@Override
+		public void run() {
+			tvMain.setText(ImportTesting.getSB());
+		}
+	};
+	Runnable importAndLoad = new Runnable() {
+		@Override
+		public void run() {
+        	new ProgressMonitor(MainActivity.this, it, updateText).execute();
+		}
+	};
     
 }

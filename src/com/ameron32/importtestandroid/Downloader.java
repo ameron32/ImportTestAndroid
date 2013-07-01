@@ -15,42 +15,42 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 
 public class Downloader extends AsyncTask<String, Integer, String> {
 
 	private static String dlDir = Environment.getExternalStorageDirectory()
 			.getPath() + "/ameron32projects/GURPSBattleFlow/";
 	private static String[] dlFiles = { "tmp.123" };
-
 	public static String getDlDir() {
 		return dlDir;
 	}
-
 	public static String[] getDlFiles() {
 		return dlFiles;
 	}
-
 	private List<String> successfulDownloads;
-
 	public String getDlPath() {
 		return dlDir + dlFiles;
 	}
-
 	private boolean isUpdate;
 
 	public void setUpdate(boolean isUpdate) {
 		this.isUpdate = isUpdate;
 	}
 
-	private ProgressDialog mDownloadDialog;
-	private Context context;
-	public Downloader(Context context, ProgressDialog mDownloadDialog, Button b) {
-		this.mDownloadDialog = mDownloadDialog;
-		this.context = context;
+	private final ProgressDialog mDownloadDialog;
+	private Runnable doNext;
+	public Downloader(Context context, Runnable doNext) {
+		this.doNext = doNext;
 		complete = false;
 		isUpdate = false;
+		
+        mDownloadDialog = new ProgressDialog(context);
+        mDownloadDialog.setTitle("Downloading from Dropbox...");
+        mDownloadDialog.setMessage("");
+        mDownloadDialog.setIndeterminate(false);
+        mDownloadDialog.setMax(100);
+        mDownloadDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mDownloadDialog.setCancelable(false);
 	}
 
 	private String currentDlFile = "";
@@ -136,7 +136,7 @@ public class Downloader extends AsyncTask<String, Integer, String> {
 				Log.e("Downloads", sb.toString());
 			}
         mDownloadDialog.dismiss();
-		
+		doNext.run();
 	}
 
 	public void setDlDir(String dlDir) {

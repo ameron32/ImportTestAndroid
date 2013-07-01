@@ -24,7 +24,7 @@
                 android:id="@+id/tvMain"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Click to Start"
+                android:text="Loading..."
                 android:textSize="10dp" />
 
         </LinearLayout>
