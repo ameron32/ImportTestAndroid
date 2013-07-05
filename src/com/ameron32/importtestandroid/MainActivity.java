@@ -19,17 +19,21 @@ public class MainActivity extends Activity implements OnClickListener {
 
     TextView tvMain;
     ImportTesting it;
-    String downloadDir = "https://dl.dropboxusercontent.com/u/949753/GURPS/GURPSBuilder/156/";
-    String sdDir = Environment.getExternalStorageDirectory()
+    private final String downloadDir = "https://dl.dropboxusercontent.com/u/949753/GURPS/GURPSBuilder/156/";
+    private final String sdDir = Environment.getExternalStorageDirectory()
             .getPath() + "/ameron32projects/GURPSBattleFlow/";
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        init();
+        start();
+    }
+    
+    private void init() {
         tvMain = (TextView) findViewById(R.id.tvMain);
         tvMain.setOnClickListener(ocl);
-        start();
     }
     
     private void start() {
