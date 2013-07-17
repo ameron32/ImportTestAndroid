@@ -19,7 +19,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
     TextView tvMain;
     ImportTesting it;
-    private final String downloadDir = "https://dl.dropboxusercontent.com/u/949753/GURPS/GURPSBuilder/156/";
+    private final String downloadDir = "https://dl.dropboxusercontent.com/u/949753/GURPS/GURPSBuilder/158/";
     private final String sdDir = Environment.getExternalStorageDirectory()
             .getPath() + "/ameron32projects/GURPSBattleFlow/";
     
