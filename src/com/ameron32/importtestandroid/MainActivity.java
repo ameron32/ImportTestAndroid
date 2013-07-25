@@ -1,5 +1,7 @@
 package com.ameron32.importtestandroid;
 
+import java.util.ArrayList;
+
 import com.ameron32.importtestandroid.Downloader;
 import com.ameron32.testing.ImportTesting;
 
@@ -7,9 +9,9 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.widget.Button;
@@ -38,12 +40,64 @@ public class MainActivity extends Activity implements OnClickListener {
     
     private void start() {
         it = new ImportTesting(new String[] { sdDir });
-        String[] fileNames = ImportTesting.getAllFilenames();
-        String[] downloadLocations = fileNames.clone();
-        for (int i = 0; i < downloadLocations.length; i++) {
-            downloadLocations[i] = downloadDir + downloadLocations[i];
+        download();
+//        String[] fileNames = ImportTesting.getAllFilenames();
+//        String[] downloadLocations = fileNames.clone();
+//        for (int i = 0; i < downloadLocations.length; i++) {
+//            downloadLocations[i] = downloadDir + downloadLocations[i];
+//        }
+//        downloadAssets(null, fileNames, true, downloadLocations);
+    }
+    
+    private void download() {
+        String[][] fileNames = ImportTesting.getAllFilenames();
+        
+		// cheat to convert the fileNames for references on the file to the
+		// right fileName
+//        for (int n = 0; n < fileNames.length; n++) {
+//        	for (String[] file : References.getReferences())
+//        		if (fileNames[n].equalsIgnoreCase(file[2])) {
+//        			fileNames[n] = file[3];
+//        		}
+//        }
+
+        ArrayList<String> updateFileNames = new ArrayList<String>();
+        ArrayList<String> noUpdateFileNames = new ArrayList<String>();
+        ArrayList<String> updateDownloadLocations = new ArrayList<String>();
+        ArrayList<String> noUpdateDownloadLocations = new ArrayList<String>();
+        
+        for (String[] fileInfo : fileNames) {
+    		String fileName = fileInfo[0];
+    		String update = fileInfo[1];
+        	String downloadLocation = fileInfo[0];
+        	// add "http" etc, if needed
+        	if (!fileInfo[0].substring(0,3).equalsIgnoreCase("http")) {
+        		downloadLocation = downloadDir + fileName;
+        	} else {
+        		downloadLocation = fileName;
+        	}
+        	
+        	// determine update
+        	if (fileInfo[1].equalsIgnoreCase("false")) {
+        		noUpdateFileNames.add(fileName);
+        		noUpdateDownloadLocations.add(downloadLocation);
+        	} else if (fileInfo[1].equalsIgnoreCase("true")){
+        		updateFileNames.add(fileName);
+        		updateDownloadLocations.add(downloadLocation);
+        	} else {
+        		Log.e("UpdateStatusUnknown","Could not determine update status. Defaulting to YES.");
+        		updateFileNames.add(fileName);
+        		updateDownloadLocations.add(downloadLocation);
+        	}
         }
-        downloadAssets(null, fileNames, true, downloadLocations);
+
+//    	// add download directory to standalone filenames, if needed
+//      for (int i = 0; i < downloadLocations.length; i++) {
+//      	if (!downloadLocations[i][0].substring(0,3).equalsIgnoreCase("http"))
+//      		downloadLocations[i][0] = downloadDir + downloadLocations[i][0];
+//      }
+        downloadAssets(null, updateFileNames, true, updateDownloadLocations);
+        downloadAssets(null, noUpdateFileNames, false, noUpdateDownloadLocations);
     }
 
     @Override
@@ -52,17 +106,20 @@ public class MainActivity extends Activity implements OnClickListener {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
-
-    private void downloadAssets(String dlDir, String[] fileNames,
-            boolean update, String[] sUrl) {
+    
+    private void downloadAssets(
+    		String dlDir, 
+    		ArrayList<String> fileNames,
+            boolean update, 
+            ArrayList<String> sUrl) {
         // execute this when the downloader must be fired
-        final Downloader d = new Downloader(MainActivity.this, importAndLoad);
+        final Downloader d = new Downloader(MainActivity.this, null);
         if (dlDir != null)
             d.setDlDir(dlDir);
-        d.setDlFiles(fileNames);
+        d.setDlFiles(fileNames.toArray(new String[0]));
         if (update)
             d.setUpdate(update);
-        d.execute(sUrl);
+        d.execute(sUrl.toArray(new String[0]));
     }
 
     @Override
